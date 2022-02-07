@@ -1,0 +1,32 @@
+{
+  "name": "mobmanserver",
+  "version": "1.0.0",
+  "description": "Backend for Mobile Management System ",
+  "main": "index.js",
+  "author": "Samim Azimi",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "connect-mongodb-session": "^3.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "gridfs-stream": "^1.1.1",
+    "json2csv": "^5.0.6",
+    "jsonwebtoken": "^8.5.1",
+    "method-override": "^3.0.0",
+    "mongodb": "^4.1.3",
+    "mongoose": "^6.0.12",
+    "multer": "^1.4.4",
+    "multer-gridfs-storage": "^5.0.2",
+    "nodemon": "^2.0.14",
+    "objects-to-csv": "^1.3.6"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "starts": "nodemon index.js"
+  }
+}

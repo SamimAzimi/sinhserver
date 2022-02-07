@@ -1,0 +1,31 @@
+
+### 
+POST  http://localhost:4000/users/register 
+Content-Type: application/json
+
+{
+    "username":"Admin",
+    "password": "admin",
+    "creditCard":"456465465",
+    "phoneNumber": "0701010",
+    "isAdmin": true
+}
+###
+POST  http://localhost:4000/rooms/booking 
+Content-Type: application/json
+
+{
+    "userID":"61fed07bf57be0beec7600e4",
+    "roomID": "61feaa1fea37fb3c0beeffd0",
+    "fromBookedDate":"2022-12-09"
+}
+
+###
+POST  http://localhost:4000/rooms/checkOut 
+Content-Type: application/json
+
+{
+    "userID":"61fed07bf57be0beec7600e4",
+    "roomID": "61fee7635466f6cca87e45f7",
+    "checkOutDate":"2023-1-09"
+}
