@@ -154,12 +154,21 @@ router.get('/allRooms', (req, res) => {
     });;
 
 })
+router.get('/availBookedRooms', (req, res) => {
+
+    const allRooms = RoomSchema.find({}, function (err, docs) {
+
+        res.json(docs)
+    });;
+
+})
 
 router.get('/BookedRooms', (req, res) => {
 
-    const allRooms = RoomSchema.find({ booked: null }, function (err, docs) {
+    const bookedRooms = RoomSchema.find({ booked: { $ne: null } }, function (err, docs) {
 
         res.json(docs)
+        console.log(docs)
     });;
 
 })
@@ -216,10 +225,11 @@ router.post('/deleteRoom', (req, res) => {
 })
 
 router.get('/availableRooms', async (req, res) => {
-    const filter = { to: { $lte: Date.now() } };
-    const availableRooms = await Rooms.find();
+    const availRooms = RoomSchema.find({ booked: null }, function (err, docs) {
 
-    res.send(allRooms)
+        res.json(docs)
+        console.log(docs)
+    });;
 })
 module.exports = router
 
