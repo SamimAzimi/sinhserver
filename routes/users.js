@@ -87,15 +87,18 @@ router.get('/CustomerRequestDetails', (req, res) => {
 
     const findUser = req.headers['authorization'];
 
-    jwt.verify(findUser, process.env.SECRET_TOKEN_JWT, async (err, user) => {
+    jwt.verify(findUser, process.env.SECRET_TOKEN_JWT, (err, user) => {
 
         if (err) {
             res.send(err)
         }
         if (user) {
 
-            const customerDetails = await User.findOne({ 'phoneNumber': user.phoneNumber })
-            res.send(customerDetails)
+            const customerDetails = User.findOne({ 'phoneNumber': user.phoneNumber }, function (err, doc) {
+
+                res.json(doc)
+            })
+
         }
 
     })

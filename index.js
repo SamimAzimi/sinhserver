@@ -40,8 +40,10 @@ app.use('/messages', message)
 const users = require('./routes/users');
 app.use('/users', users)
 
-// const admins = require('./routes/admin.routes')
-// app.use('/Admins', admins)
+const admins = require('./routes/admin.route')
+app.use('/admin', admins)
+
+
 
 // const ExpireDateCheck = (req, res, next) => {
 

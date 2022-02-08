@@ -2,22 +2,64 @@ const express = require('express')
 const mongoose = require('mongoose')
 const RoomSchema = require('../models/rooms.model')
 const BookedRoom = require('../models/booked.model')
+const User = require('../models/users.model')
 const router = express.Router();
 const multer = require('multer')
 
 router.post('/bookingShow', async (req, res) => {
 
-    const booked = await BookedRoom.findOne({ "userID": req.body.userID }).exec();
-    console.log(booked)
+    const booked = await BookedRoom.find({ "userID": req.body.userID }).populate('room').exec();
+    // console.log(booked)
     res.send(booked)
 })
 
+
+router.get('/generalCount', (req, res) => {
+
+    var generalCount = []
+    var allRooms = RoomSchema.find({});
+    var allUser = User.find()
+    var availableRooms = RoomSchema.find({ booked: null })
+    var bookedRooms = RoomSchema.find({ booked: { $ne: null } });
+    var allAdmin = User.find({ isAdmin: true })
+
+    var allCustomer = User.find({ isAdmin: { $ne: true } })
+
+    allRooms.count(function (err, count) {
+        if (err) console.log(err)
+        generalCount = [{ id: 'allrooms', value: count }];
+    })
+
+    allUser.count(function (err, count) {
+        if (err) console.log(err)
+        generalCount.push({ 'id': 'allUser', 'value': count })
+
+    });
+    availableRooms.count(function (err, count) {
+        if (err) console.log(err)
+        generalCount.push({ 'id': 'availableRooms', 'value': count })
+    });
+    bookedRooms.count(function (err, count) {
+        if (err) console.log(err)
+        generalCount.push({ 'id': 'bookedRooms', 'value': count })
+    });
+    allAdmin.count(function (err, count) {
+        if (err) console.log(err)
+        generalCount.push({ 'id': 'allAdmin', 'value': count })
+    });
+    allCustomer.count(function (err, count) {
+        if (err) console.log(err)
+        generalCount.push({ 'id': 'allCustomer', 'value': count })
+        res.send(generalCount)
+    });
+})
 router.post('/booking', (req, res) => {
+    if (!req.body.userID && req.body.roomID && req.body.fromBookedDate) return console.log('not Found')
     const userID = req.body.userID;
     const roomID = req.body.roomID;
     const bookedDate = req.body.fromBookedDate
     // book the room 
-
+    // console.log(req.body)
     var booking = new BookedRoom({
         username: mongoose.Types.ObjectId(userID),
         room: mongoose.Types.ObjectId(roomID),
@@ -25,7 +67,7 @@ router.post('/booking', (req, res) => {
     })
     booking.save().then((doc) => {
         console.log('booked', doc)
-        RoomSchema.findOneAndUpdate({ "_id": roomID }, { $set: { booked: roomID } }, function (err, doc) {
+        RoomSchema.findOneAndUpdate({ "_id": roomID }, { $set: { booked: doc._id } }, function (err, docs) {
             if (err) {
                 res.send("Error")
             } else {
@@ -45,34 +87,35 @@ router.post('/booking', (req, res) => {
 })
 
 router.post('/checkOut', async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const userID = mongoose.Types.ObjectId(req.body.userID);
     const checkOutDate = req.body.checkOutDate;
     const roomID = mongoose.Types.ObjectId(req.body.roomID);
 
     const price = await RoomSchema.findOne({ "_id": roomID }, 'roomPrice');
-    const from = await BookedRoom.findOne({ "userID": userID }, 'from');
+    const from = await BookedRoom.findOne({ "username": userID, "room": roomID }, 'from');
 
     try {
         const data1 = new Date(from.from).getTime()
         const data2 = new Date(checkOutDate).getTime()
         const days = (data2 - data1) / (1000 * 3600 * 24)
-        const total = days * price;
-        console.log(total)
+        const total = days * price.roomPrice;
+        // console.log("total", total, "days", days, "price", price)
 
-        BookedRoom.findOneAndUpdate({ "username": userID }, { $set: { payment: total, to: checkOutDate } }, function (err, doc) {
+        BookedRoom.findOneAndUpdate({ "username": userID, "room": roomID, "to": null }, { $set: { payment: total, to: checkOutDate } }, function (err, doc) {
             if (err) {
+                // console.log(err)
                 res.send("Error")
             } else {
                 if (doc) {
-                    console.log('payment dones')
+                    // console.log('payment dones', doc)
                     RoomSchema.findOneAndUpdate({ "_id": roomID }, { $set: { booked: null } }, function (err, doc) {
                         if (err) {
                             res.send("Error")
                         } else {
                             if (doc) {
 
-                                console.log("Room Unbooked")
+                                res.send("Room Unbooked")
 
                             }
                             else {
@@ -150,7 +193,9 @@ router.get('/allRooms', (req, res) => {
 
     const allRooms = RoomSchema.find({ booked: null }, function (err, docs) {
 
+
         res.json(docs)
+
     });;
 
 })
@@ -168,7 +213,7 @@ router.get('/BookedRooms', (req, res) => {
     const bookedRooms = RoomSchema.find({ booked: { $ne: null } }, function (err, docs) {
 
         res.json(docs)
-        console.log(docs)
+
     });;
 
 })

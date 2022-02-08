@@ -29,3 +29,7 @@ Content-Type: application/json
     "roomID": "61fee7635466f6cca87e45f7",
     "checkOutDate":"2023-1-09"
 }
+
+### 
+GET  http://localhost:4000/admin/paymentsum
+  
